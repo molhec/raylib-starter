@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // --- keep your existing Windows/Linux "Debug"/"Run" (cppdbg) here ---
+    // macOS — Debug (CodeLLDB, plain executable)
+    {
+      "name": "Debug (macOS, lldb)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "preLaunchTask": "build debug"
+    },
+    // macOS — Debug (CodeLLDB, .app bundle)
+    // Use this if your build outputs a .app bundle instead of a plain exe.
+    {
+      "name": "Debug (macOS .app, lldb)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}.app/Contents/MacOS/${fileBasenameNoExtension}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "preLaunchTask": "build debug"
+    },
+    // macOS — Run (CodeLLDB, plain executable)
+    {
+      "name": "Run (macOS, lldb)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "preLaunchTask": "build release"
+    },
+    // macOS — Run (CodeLLDB, .app bundle)
+    {
+      "name": "Run (macOS .app, lldb)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}.app/Contents/MacOS/${fileBasenameNoExtension}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "preLaunchTask": "build release"
+    }
+  ]
+}
