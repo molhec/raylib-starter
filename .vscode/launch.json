@@ -1,32 +1,55 @@
 {
   "version": "0.2.0",
   "configurations": [
+    // ---- WSL / Linux (gdb) ----
     {
-      "name": "Run game (auto OS)",
-      "type": "cppdbg", // base type; we’ll override on macOS
+      "name": "Run game (WSL/Linux, gdb)",
+      "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/game", // default (Linux/macOS)
+      "program": "${workspaceFolder}/game",
       "cwd": "${workspaceFolder}",
       "args": [],
-      "env": {},
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "externalConsole": false,
       "preLaunchTask": "build:debug",
-      "externalConsole": true,
       "MIMode": "gdb",
-      "osx": {
-        "type": "lldb",
-        "program": "${workspaceFolder}/game",
-        "preLaunchTask": "build:debug:mac",
-        "console": "integratedTerminal",
-        "externalConsole": false
-      },
-      "windows": {
-        "type": "cppdbg",
-        "program": "${workspaceFolder}/game.exe",
-        "preLaunchTask": "build:debug:win",
-        "MIMode": "gdb",
-        "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe",
-        "externalConsole": true
-      }
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [{ "text": "-enable-pretty-printing" }],
+      "environment": [
+        { "name": "DISPLAY", "value": "${env:DISPLAY}" },
+        { "name": "WAYLAND_DISPLAY", "value": "${env:WAYLAND_DISPLAY}" },
+        { "name": "LIBGL_ALWAYS_INDIRECT", "value": "${env:LIBGL_ALWAYS_INDIRECT}" }
+      ]
+    },
+
+    // ---- macOS (lldb) ----
+    {
+      "name": "Run game (macOS, lldb)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/game",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "externalConsole": false,
+      "preLaunchTask": "build:debug:mac"
+    },
+
+    // ---- Windows native (optional; only if you ever build a .exe) ----
+    {
+      "name": "Run game (Windows .exe, gdb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/game.exe",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "preLaunchTask": "build:debug:win",
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe"
     }
   ]
 }

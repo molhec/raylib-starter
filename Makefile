@@ -1,13 +1,11 @@
-# ===================== Cross-platform Makefile (macOS + Windows 11) =====================
+# ===================== Cross-Platform Makefile (WSL/Linux + macOS) =====================
 
-.PHONY: all clean run
+.PHONY: all clean run info
 
-# ---- Project ----
 PROJECT_NAME ?= game
 PLATFORM     ?= PLATFORM_DESKTOP
 
 # ---- Detect OS ----
-# Windows with MinGW/MSYS/CMD sets OS=Windows_NT
 ifeq ($(OS),Windows_NT)
   TARGET_OS := WINDOWS
 else
@@ -21,77 +19,103 @@ else
   endif
 endif
 
-# ---- Compiler ----
-CC := g++
+# ---- Compiler / Flags ----
+CXX      := g++
 ifeq ($(TARGET_OS),MAC)
-  CC := clang++
+  CXX    := clang++
 endif
 
-# ---- Build mode ----
-BUILD_MODE ?= DEBUG
-CFLAGS := -Wall -std=c++17 -D_DEFAULT_SOURCE -Wno-missing-braces
-ifeq ($(BUILD_MODE),DEBUG)
-  CFLAGS += -g -O0
+CXXFLAGS := -Wall -std=c++17 -D_DEFAULT_SOURCE -Wno-missing-braces
+BUILD    ?= DEBUG
+ifeq ($(BUILD),DEBUG)
+  CXXFLAGS += -g -O0
 else
-  CFLAGS += -s -O2
+  CXXFLAGS += -s -O2
 endif
 
-# ---- Sources (all .cpp in root and lib/) ----
-SRCS := $(wildcard *.cpp) $(wildcard lib/*.cpp)
-
-# ---- Includes ----
+# ---- Sources / Includes ----
+SRCS          := $(wildcard *.cpp) $(wildcard lib/*.cpp)
 INCLUDE_PATHS := -I. -Ilib
+LDFLAGS       :=
+LDLIBS        :=
 
-# On macOS, prefer Homebrew includes if present
+# =============================================================================
+#                              LINUX / WSL
+# =============================================================================
+ifeq ($(TARGET_OS),LINUX)
+  # Point these to your local checkout/build (override on CLI if needed)
+  RAYLIB_HOME      ?= $(HOME)/raylib
+  RAYLIB_INCLUDEDIR?= $(RAYLIB_HOME)/src
+  RAYLIB_LIBDIR    ?= $(RAYLIB_HOME)/cmake-build/raylib
+
+  INCLUDE_PATHS    += -I$(RAYLIB_INCLUDEDIR)
+
+  # Try explicit libdir first; if not found, search anywhere under RAYLIB_HOME
+  RAYLIB_LIB := \
+    $(firstword \
+      $(wildcard $(RAYLIB_LIBDIR)/libraylib.a) \
+      $(wildcard $(RAYLIB_LIBDIR)/libraylib.so) \
+      $(shell find $(RAYLIB_HOME) -type f \( -name libraylib.a -o -name libraylib.so \) 2>/dev/null | head -n1) \
+    )
+  RAYLIB_DIR := $(dir $(RAYLIB_LIB))
+
+  LINUX_SYS_LIBS := -lGL -lm -lpthread -ldl -lrt -lX11
+
+  ifneq ($(findstring .a,$(RAYLIB_LIB)),)
+    LDLIBS  += $(RAYLIB_LIB) $(LINUX_SYS_LIBS)
+  else ifneq ($(findstring .so,$(RAYLIB_LIB)),)
+    LDFLAGS += -L$(RAYLIB_DIR) -Wl,-rpath,$(RAYLIB_DIR)
+    LDLIBS  += -lraylib $(LINUX_SYS_LIBS)
+  endif
+endif
+
+# =============================================================================
+#                                 macOS
+# =============================================================================
 ifeq ($(TARGET_OS),MAC)
-  ifneq ($(wildcard /opt/homebrew/include/.*),)
-    INCLUDE_PATHS += -I/opt/homebrew/include
+  # Prefer pkg-config if available (brew install raylib pkg-config)
+  ifeq ($(shell command -v pkg-config >/dev/null 2>&1 && pkg-config --exists raylib && echo yes),yes)
+    CXXFLAGS += $(shell pkg-config --cflags raylib)
+    LDLIBS   += $(shell pkg-config --libs raylib)
+  else
+    BREW_PREFIX ?= $(shell brew --prefix 2>/dev/null)
+    ifneq ($(BREW_PREFIX),)
+      INCLUDE_PATHS += -I$(BREW_PREFIX)/include
+      LDFLAGS      += -L$(BREW_PREFIX)/lib
+    else
+      ifneq ($(wildcard /opt/homebrew/include),)
+        INCLUDE_PATHS += -I/opt/homebrew/include
+        LDFLAGS      += -L/opt/homebrew/lib
+      endif
+      ifneq ($(wildcard /usr/local/include),)
+        INCLUDE_PATHS += -I/usr/local/include
+        LDFLAGS      += -L/usr/local/lib
+      endif
+    endif
+
+    LDLIBS += -lraylib \
+              -framework Cocoa -framework IOKit -framework CoreVideo \
+              -framework OpenGL -framework OpenAL
   endif
 endif
 
-# On Windows, set where raylib is installed (override from env/CLI if needed)
-# Examples:
-#   set RAYLIB_ROOT=C:/raylib/w64devkit/x86_64-w64-mingw32      (raylib official kit)
-#   set RAYLIB_ROOT=C:/msys64/mingw64                           (MSYS2)
-RAYLIB_ROOT ?=
-ifeq ($(TARGET_OS),WINDOWS)
-  ifneq ($(RAYLIB_ROOT),)
-    INCLUDE_PATHS += -I$(RAYLIB_ROOT)/include
-  endif
-endif
-
-# ---- Linker paths ----
-LDFLAGS := -L.
-
-ifeq ($(TARGET_OS),MAC)
-  ifneq ($(wildcard /opt/homebrew/lib/.*),)
-    LDFLAGS += -L/opt/homebrew/lib
-  endif
-endif
-
-ifeq ($(TARGET_OS),WINDOWS)
-  ifneq ($(RAYLIB_ROOT),)
-    LDFLAGS += -L$(RAYLIB_ROOT)/lib
-  endif
-endif
-
-# ---- Libraries per-OS ----
-ifeq ($(TARGET_OS),MAC)
-  LDLIBS := -lraylib -framework OpenGL -framework OpenAL -framework Cocoa -framework IOKit
-else ifeq ($(TARGET_OS),WINDOWS)
-  # MinGW libraries for raylib on Windows
-  LDLIBS := -lraylib -lopengl32 -lgdi32 -lwinmm
-else ifeq ($(TARGET_OS),LINUX)
-  LDLIBS := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-else
-  LDLIBS := -lraylib
-endif
-
-# ---- Default target ----
+# =============================================================================
+#                                   Targets
+# =============================================================================
 all: $(PROJECT_NAME)
 
+# Guard: show a clear message only when building on Linux and lib is missing
 $(PROJECT_NAME): $(SRCS)
-	$(CC) -o $@ $(SRCS) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
+	@if [ "$(TARGET_OS)" = "LINUX" ] && [ ! -f "$(RAYLIB_LIB)" ]; then \
+	  echo "✗ Could not find libraylib.{a,so}."; \
+	  echo "  Expected under:"; \
+	  echo "    RAYLIB_LIBDIR=$(RAYLIB_LIBDIR)  or anywhere in $(RAYLIB_HOME)"; \
+	  echo "  Build raylib with:"; \
+	  echo "    cd $(RAYLIB_HOME) && rm -rf cmake-build && mkdir cmake-build && cd cmake-build && \\"; \
+	  echo "    cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release && cmake --build . -j"; \
+	  exit 1; \
+	fi
+	$(CXX) $(SRCS) -o $@ $(CXXFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
 
 run: all
 	./$(PROJECT_NAME)
@@ -99,3 +123,13 @@ run: all
 clean:
 	@rm -f $(PROJECT_NAME) *.o 2>/dev/null || true
 	@echo Cleaning done
+
+info:
+	@echo "TARGET_OS       : $(TARGET_OS)"
+	@echo "RAYLIB_HOME     : $(RAYLIB_HOME)"
+	@echo "RAYLIB_INCLUDEDIR: $(RAYLIB_INCLUDEDIR)"
+	@echo "RAYLIB_LIBDIR   : $(RAYLIB_LIBDIR)"
+	@echo "Detected lib    : $(RAYLIB_LIB)"
+	@echo "INCLUDE_PATHS   : $(INCLUDE_PATHS)"
+	@echo "LDFLAGS         : $(LDFLAGS)"
+	@echo "LDLIBS          : $(LDLIBS)"
