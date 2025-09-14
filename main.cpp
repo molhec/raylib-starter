@@ -1,51 +1,61 @@
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
+#include "lib/Player.h"
+#include "lib/Platform.h"
+#include "lib/physics/CollisionWorld.h"
 
 using namespace std;
 
-float ClampValue(float value, float min, float max) {
-    return fminf(fmaxf(value, min), max);
-}
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 300;
 
-int main () {
-
-    const int SCREEN_WIDTH = 800;
-    const int SCREEN_HEIGHT = 600;
-    int ball_x = 100;
-    int ball_y = 500;
-    int ball_speed_x = 500;
-    int ball_speed_y = 500;
-    int ball_radius = 15;
-
-    cout << "Hello World" << endl;
-
+int main()
+{
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Bouncy Ball");
-    SetTargetFPS(120);
+    SetTargetFPS(60);
 
-    while (WindowShouldClose() == false){
+    // Create GameObjects
+    Player player;
+    Platform platform({SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.6f}, {100, 20}, RED);
+    Platform platform2({SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.4f}, {100, 20}, RED);
+    Platform platform3({SCREEN_WIDTH * 0.7f, SCREEN_HEIGHT * 0.6f}, {100, 20}, RED);
+
+    CollisionWorld world;
+    // ground
+    world.AddStatic(Rectangle{0, SCREEN_HEIGHT - 10, (float)SCREEN_WIDTH, 30});
+    // left wall
+    world.AddStatic(Rectangle{-30, 0, 30, (float)SCREEN_HEIGHT});
+    // right wall
+    world.AddStatic(Rectangle{SCREEN_WIDTH, 0, 30, (float)SCREEN_HEIGHT});
+
+    // Start Gameobjects
+    player.Start();
+    platform.Start(world);
+    platform2.Start(world);
+    platform3.Start(world);
+
+    while (WindowShouldClose() == false)
+    {
         float dt = GetFrameTime();
 
-        // Movement input
-        int dirX = (IsKeyDown(KEY_RIGHT) - IsKeyDown(KEY_LEFT));
-        //int dirY = (IsKeyDown(KEY_DOWN) - IsKeyDown(KEY_UP));
-
-        if(IsKeyPressed(KEY_SPACE))
-        {
-            ball_y -= 100;
-        }
-
-        // Update position
-        ball_x += dirX * ball_speed_x * dt;
-        ball_y += 400 * dt;     
-
-        // Clamp to screen edges
-        ball_x = ClampValue(ball_x, ball_radius, SCREEN_WIDTH - ball_radius);
-        ball_y = ClampValue(ball_y, ball_radius, SCREEN_HEIGHT - ball_radius);
+        // Update Gameobjects
+        player.Update(dt, world);
+        // platform.Update(dt);
 
         BeginDrawing();
-            ClearBackground(BLACK);
-            DrawCircle(ball_x,ball_y,ball_radius, WHITE);
+        ClearBackground(BLACK);
+
+        // Draw GameObjects
+        for (auto &p : world.GetStatics())
+            DrawRectangle(p.x, p.y, p.width, p.height, GRAY);
+
+        player.Draw();
+        platform.Draw();
+        platform2.Draw();
+        platform3.Draw();
+
+        DrawFPS(0, 0);
         EndDrawing();
     }
 
