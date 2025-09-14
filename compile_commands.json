@@ -1,0 +1,71 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Wall",
+      "-std=c++17",
+      "-D_DEFAULT_SOURCE",
+      "-Wno-missing-braces",
+      "-g",
+      "-O0",
+      "-I.",
+      "-Ilib",
+      "-I/home/molhec/raylib/src",
+      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
+      "-DPLATFORM_DESKTOP",
+      "-o",
+      "game",
+      "main.cpp"
+    ],
+    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
+    "file": "/home/molhec/dev/raylib-projects/raylib-starter/main.cpp",
+    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Wall",
+      "-std=c++17",
+      "-D_DEFAULT_SOURCE",
+      "-Wno-missing-braces",
+      "-g",
+      "-O0",
+      "-I.",
+      "-Ilib",
+      "-I/home/molhec/raylib/src",
+      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
+      "-DPLATFORM_DESKTOP",
+      "-o",
+      "game",
+      "lib/Platform.cpp"
+    ],
+    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
+    "file": "/home/molhec/dev/raylib-projects/raylib-starter/lib/Platform.cpp",
+    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Wall",
+      "-std=c++17",
+      "-D_DEFAULT_SOURCE",
+      "-Wno-missing-braces",
+      "-g",
+      "-O0",
+      "-I.",
+      "-Ilib",
+      "-I/home/molhec/raylib/src",
+      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
+      "-DPLATFORM_DESKTOP",
+      "-o",
+      "game",
+      "lib/Player.cpp"
+    ],
+    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
+    "file": "/home/molhec/dev/raylib-projects/raylib-starter/lib/Player.cpp",
+    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+  }
+]
