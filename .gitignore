@@ -1,3 +1,5 @@
 *.exe
 *.dsym
 main
+compile_commands.json
+.cache

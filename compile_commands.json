@@ -1,7 +1,7 @@
 [
   {
     "arguments": [
-      "/usr/bin/g++",
+      "/usr/bin/clang++",
       "-c",
       "-Wall",
       "-std=c++17",
@@ -9,22 +9,21 @@
       "-Wno-missing-braces",
       "-g",
       "-O0",
+      "-I/opt/homebrew/Cellar/raylib/5.5/include",
       "-I.",
       "-Ilib",
-      "-I/home/molhec/raylib/src",
-      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
       "-DPLATFORM_DESKTOP",
       "-o",
       "game",
       "main.cpp"
     ],
-    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
-    "file": "/home/molhec/dev/raylib-projects/raylib-starter/main.cpp",
-    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+    "directory": "/Users/molhec/Documents/Raylib Projects/raylib-starter",
+    "file": "/Users/molhec/Documents/Raylib Projects/raylib-starter/main.cpp",
+    "output": "/Users/molhec/Documents/Raylib Projects/raylib-starter/game"
   },
   {
     "arguments": [
-      "/usr/bin/g++",
+      "/usr/bin/clang++",
       "-c",
       "-Wall",
       "-std=c++17",
@@ -32,22 +31,21 @@
       "-Wno-missing-braces",
       "-g",
       "-O0",
+      "-I/opt/homebrew/Cellar/raylib/5.5/include",
       "-I.",
       "-Ilib",
-      "-I/home/molhec/raylib/src",
-      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
       "-DPLATFORM_DESKTOP",
       "-o",
       "game",
       "lib/Platform.cpp"
     ],
-    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
-    "file": "/home/molhec/dev/raylib-projects/raylib-starter/lib/Platform.cpp",
-    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+    "directory": "/Users/molhec/Documents/Raylib Projects/raylib-starter",
+    "file": "/Users/molhec/Documents/Raylib Projects/raylib-starter/lib/Platform.cpp",
+    "output": "/Users/molhec/Documents/Raylib Projects/raylib-starter/game"
   },
   {
     "arguments": [
-      "/usr/bin/g++",
+      "/usr/bin/clang++",
       "-c",
       "-Wall",
       "-std=c++17",
@@ -55,17 +53,16 @@
       "-Wno-missing-braces",
       "-g",
       "-O0",
+      "-I/opt/homebrew/Cellar/raylib/5.5/include",
       "-I.",
       "-Ilib",
-      "-I/home/molhec/raylib/src",
-      "/home/molhec/raylib/cmake-build/raylib/libraylib.a",
       "-DPLATFORM_DESKTOP",
       "-o",
       "game",
       "lib/Player.cpp"
     ],
-    "directory": "/home/molhec/dev/raylib-projects/raylib-starter",
-    "file": "/home/molhec/dev/raylib-projects/raylib-starter/lib/Player.cpp",
-    "output": "/home/molhec/dev/raylib-projects/raylib-starter/game"
+    "directory": "/Users/molhec/Documents/Raylib Projects/raylib-starter",
+    "file": "/Users/molhec/Documents/Raylib Projects/raylib-starter/lib/Player.cpp",
+    "output": "/Users/molhec/Documents/Raylib Projects/raylib-starter/game"
   }
 ]
